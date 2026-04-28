@@ -1,0 +1,8 @@
+{
+  "name": "madrahimov.s-openssl-certificate-builder",
+  "version": "1.0.0",
+  "description": "Cross-platform web application for creating certificates using OpenSSL commands",
+  "scripts": {
+    "start": "vercel dev"
+  }
+}

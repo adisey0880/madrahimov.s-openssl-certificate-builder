@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenSSL Certificate Builder — Мадрахимов Сарвар</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="top-nav">
+        <div class="logo">OpenSSL Builder</div>
+        <nav>
+            <ul>
+                <li><a href="#home">Главная</a></li>
+                <li><a href="#task">Задача</a></li>
+                <li><a href="#theory">Теория</a></li>
+                <li><a href="#algorithm">Алгоритм</a></li>
+                <li><a href="#keygen">Ключ</a></li>
+                <li><a href="#csr">CSR</a></li>
+                <li><a href="#cert">Сертификат</a></li>
+                <li><a href="#verify">Проверка</a></li>
+                <li><a href="#commands">Команды</a></li>
+                <li><a href="#results">Результаты</a></li>
+                <li><a href="#instruction">Инструкция</a></li>
+                <li><a href="#about">Об авторе</a></li>
+            </ul>
+        </nav>
+        <div class="author-badge">Мадрахимов Сарвар</div>
+    </header>
+
+    <main>
+        <!-- 1. Home -->
+        <section id="home" class="hero-section">
+            <div class="container">
+                <h1>OpenSSL Certificate Builder</h1>
+                <h2>Создание цифровых сертификатов с помощью OpenSSL</h2>
+                <p class="author-info">Автор: Мадрахимов Сарвар</p>
+                <p class="description">Веб-приложение демонстрирует процесс генерации ключей, создания CSR-запросов, выпуска сертификатов и проверки сертификатов с использованием команд OpenSSL.</p>
+                <div class="action-buttons">
+                    <a href="#keygen" class="btn btn-primary">Создать ключ</a>
+                    <a href="#csr" class="btn btn-secondary">Создать CSR</a>
+                    <a href="#cert" class="btn btn-secondary">Выпустить сертификат</a>
+                    <a href="#verify" class="btn btn-secondary">Проверить сертификат</a>
+                    <a href="#commands" class="btn btn-outline">OpenSSL команды</a>
+                    <a href="#instruction" class="btn btn-outline">Инструкция</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Постановка задачи -->
+        <section id="task" class="content-section">
+            <div class="container">
+                <h2>Постановка задачи</h2>
+                <div class="card">
+                    <p>Задачей проекта является разработка веб-приложения, которое демонстрирует процесс создания цифровых сертификатов с использованием программы OpenSSL. Приложение должно формировать команды OpenSSL, показывать этапы генерации закрытого ключа, создания CSR-запроса, выпуска сертификата и проверки его параметров.</p>
+                    <ul class="task-list">
+                        <li>изучить назначение цифровых сертификатов;</li>
+                        <li>рассмотреть роль OpenSSL при работе с сертификатами;</li>
+                        <li>реализовать генератор команд для создания закрытого ключа;</li>
+                        <li>реализовать генератор команд для создания CSR-запроса;</li>
+                        <li>реализовать симуляцию выпуска сертификата;</li>
+                        <li>реализовать отображение структуры сертификата;</li>
+                        <li>реализовать проверку срока действия сертификата;</li>
+                        <li>подготовить результаты работы программы и инструкцию пользователя.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Теория -->
+        <section id="theory" class="content-section bg-light">
+            <div class="container">
+                <h2>Теория: цифровые сертификаты и OpenSSL</h2>
+                <div class="grid-cards">
+                    <div class="theory-card">
+                        <h3>Цифровой сертификат</h3>
+                        <p>Связывает открытый ключ с владельцем и используется для подтверждения подлинности.</p>
+                    </div>
+                    <div class="theory-card">
+                        <h3>OpenSSL</h3>
+                        <p>Набор инструментов и библиотек для работы с криптографией, ключами, сертификатами и TLS/SSL.</p>
+                    </div>
+                    <div class="theory-card">
+                        <h3>Закрытый ключ</h3>
+                        <p>Используется для подписи CSR и должен храниться в строгом секрете.</p>
+                    </div>
+                    <div class="theory-card">
+                        <h3>CSR-запрос</h3>
+                        <p>Certificate Signing Request, запрос на выпуск сертификата, содержащий данные владельца и открытый ключ.</p>
+                    </div>
+                    <div class="theory-card">
+                        <h3>Центр сертификации</h3>
+                        <p>CA проверяет данные владельца и выпускает подписанный сертификат.</p>
+                    </div>
+                    <div class="theory-card">
+                        <h3>Самоподписанный сертификат</h3>
+                        <p>Сертификат, подписанный собственным закрытым ключом. Подходит для тестирования, но не является доверенным в публичных системах.</p>
+                    </div>
+                    <div class="theory-card">
+                        <h3>Практическое применение</h3>
+                        <p>HTTPS, корпоративные сервисы, VPN, электронная подпись, защищённые соединения, тестовые стенды.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Алгоритм -->
+        <section id="algorithm" class="content-section">
+            <div class="container">
+                <h2>Алгоритм создания сертификата</h2>
+                <p class="section-desc">Создание сертификата начинается с генерации закрытого ключа. Далее на основе ключа формируется CSR-запрос, который передаётся в центр сертификации. После проверки данных CA выпускает сертификат, который можно проверить с помощью OpenSSL.</p>
+                <div class="stepper">
+                    <div class="step">
+                        <div class="step-circle">1</div>
+                        <div class="step-title">Generate Private Key</div>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="step">
+                        <div class="step-circle">2</div>
+                        <div class="step-title">Create CSR</div>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="step">
+                        <div class="step-circle">3</div>
+                        <div class="step-title">Submit CSR to CA</div>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="step">
+                        <div class="step-circle">4</div>
+                        <div class="step-title">Issue Certificate</div>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="step">
+                        <div class="step-circle">5</div>
+                        <div class="step-title">Verify Certificate</div>
+                    </div>
+                </div>
+                <div class="flow-diagram">
+                    Private Key → CSR → CA Signing → Certificate → Verification
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. Генерация закрытого ключа -->
+        <section id="keygen" class="content-section bg-light">
+            <div class="container">
+                <h2>Генерация закрытого ключа</h2>
+                <div class="card warning-card">
+                    <strong>Внимание:</strong> Закрытый ключ нельзя передавать другим пользователям.
+                </div>
+                <div class="form-container">
+                    <div class="form-group">
+                        <label for="key-algo">Algorithm</label>
+                        <select id="key-algo">
+                            <option value="rsa">RSA</option>
+                            <option value="ec">EC</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="rsa-size-group">
+                        <label for="key-size">Key Size</label>
+                        <select id="key-size">
+                            <option value="2048">2048</option>
+                            <option value="4096">4096</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="ec-curve-group" style="display: none;">
+                        <label for="ec-curve">EC Curve</label>
+                        <select id="ec-curve">
+                            <option value="prime256v1">prime256v1</option>
+                            <option value="secp384r1">secp384r1</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="key-filename">Key filename</label>
+                        <input type="text" id="key-filename" value="private.key">
+                    </div>
+                    <button id="btn-generate-key" class="btn btn-primary">Сформировать команду генерации ключа</button>
+                </div>
+                <div id="keygen-result" class="result-box" style="display: none;">
+                    <h3>Сгенерированная команда:</h3>
+                    <div class="terminal-block">
+                        <span class="prompt">$</span> <span id="keygen-cmd-text"></span>
+                        <button class="btn-copy" onclick="copyCommand('keygen-cmd-text')">Копировать команду</button>
+                    </div>
+                    <p id="keygen-desc" class="cmd-desc" style="color: var(--text-muted); margin-bottom: 10px;"></p>
+                    <div class="mock-result">
+                        <strong>Учебный результат:</strong> <br>
+                        Private key generated successfully
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. Создание CSR -->
+        <section id="csr" class="content-section">
+            <div class="container">
+                <h2>Создание CSR-запроса</h2>
+                <p class="section-desc">CSR содержит данные владельца сертификата и открытый ключ. Закрытый ключ в CSR не передаётся.</p>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="csr-cn">Common Name (CN)</label>
+                        <input type="text" id="csr-cn" value="example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="csr-o">Organization (O)</label>
+                        <input type="text" id="csr-o" value="My Company">
+                    </div>
+                    <div class="form-group">
+                        <label for="csr-ou">Organizational Unit (OU)</label>
+                        <input type="text" id="csr-ou" value="IT Department">
+                    </div>
+                    <div class="form-group">
+                        <label for="csr-c">Country (C)</label>
+                        <input type="text" id="csr-c" value="RU">
+                    </div>
+                    <div class="form-group">
+                        <label for="csr-st">State (ST)</label>
+                        <input type="text" id="csr-st" value="Moscow">
+                    </div>
+                    <div class="form-group">
+                        <label for="csr-l">Locality (L)</label>
+                        <input type="text" id="csr-l" value="Moscow">
+                    </div>
+                    <div class="form-group">
+                        <label for="csr-email">Email</label>
+                        <input type="text" id="csr-email" value="admin@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="csr-key-file">Key filename</label>
+                        <input type="text" id="csr-key-file" value="private.key">
+                    </div>
+                    <div class="form-group">
+                        <label for="csr-file">CSR filename</label>
+                        <input type="text" id="csr-file" value="request.csr">
+                    </div>
+                </div>
+                <button id="btn-generate-csr" class="btn btn-primary">Сформировать команду CSR</button>
+                
+                <div id="csr-result" class="result-box" style="display: none;">
+                    <h3>Сгенерированная команда:</h3>
+                    <div class="terminal-block">
+                        <span class="prompt">$</span> <span id="csr-cmd-text"></span>
+                        <button class="btn-copy" onclick="copyCommand('csr-cmd-text')">Копировать</button>
+                    </div>
+                    <div class="mock-result">
+                        <strong>Учебный профиль CSR:</strong>
+                        <table class="data-table">
+                            <tbody id="csr-profile-table">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. Выпуск сертификата -->
+        <section id="cert" class="content-section bg-light">
+            <div class="container">
+                <h2>Выпуск сертификата</h2>
+                <p class="section-desc">В данном веб-приложении выпуск сертификата является учебной симуляцией. В реальной среде команды выполняются в терминале OpenSSL.</p>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="cert-file">Certificate filename</label>
+                        <input type="text" id="cert-file" value="certificate.crt">
+                    </div>
+                    <div class="form-group">
+                        <label for="cert-days">Validity days</label>
+                        <input type="number" id="cert-days" value="365">
+                    </div>
+                    <div class="form-group">
+                        <label for="cert-ca-file">CA certificate filename</label>
+                        <input type="text" id="cert-ca-file" value="ca.crt">
+                    </div>
+                    <div class="form-group">
+                        <label for="cert-ca-key">CA key filename</label>
+                        <input type="text" id="cert-ca-key" value="ca.key">
+                    </div>
+                </div>
+                <div class="action-buttons" style="justify-content: flex-start;">
+                    <button id="btn-cert-self" class="btn btn-secondary">Создать самоподписанный сертификат</button>
+                    <button id="btn-cert-ca" class="btn btn-primary">Создать сертификат через CA</button>
+                </div>
+
+                <div id="cert-result" class="result-box" style="display: none;">
+                    <h3>Сгенерированная команда:</h3>
+                    <div class="terminal-block">
+                        <span class="prompt">$</span> <span id="cert-cmd-text"></span>
+                        <button class="btn-copy" onclick="copyCommand('cert-cmd-text')">Копировать</button>
+                    </div>
+                    <div class="mock-result">
+                        <strong>Учебный сертификат:</strong>
+                        <table class="data-table">
+                            <tbody id="cert-profile-table">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 8. Проверка сертификата -->
+        <section id="verify" class="content-section">
+            <div class="container">
+                <h2>Проверка сертификата</h2>
+                <div class="form-container">
+                    <div class="form-group">
+                        <label for="verify-cert-file">Certificate filename</label>
+                        <input type="text" id="verify-cert-file" value="certificate.crt">
+                    </div>
+                    <div class="form-group">
+                        <label for="verify-ca-file">CA filename</label>
+                        <input type="text" id="verify-ca-file" value="ca.crt">
+                    </div>
+                    <div class="form-group">
+                        <label for="verify-date">Current date</label>
+                        <input type="date" id="verify-date">
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button id="btn-verify-struct" class="btn btn-outline">Показать структуру сертификата</button>
+                    <button id="btn-verify-dates" class="btn btn-outline">Проверить срок действия</button>
+                    <button id="btn-verify-ca" class="btn btn-outline">Проверить сертификат через CA</button>
+                    <button id="btn-verify-hash" class="btn btn-outline">Показать SHA-256 fingerprint</button>
+                </div>
+
+                <div id="verify-result" class="result-box" style="display: none;">
+                    <h3>Сгенерированная команда:</h3>
+                    <div class="terminal-block">
+                        <span class="prompt">$</span> <span id="verify-cmd-text"></span>
+                        <button class="btn-copy" onclick="copyCommand('verify-cmd-text')">Копировать</button>
+                    </div>
+                    <div class="mock-result">
+                        <strong>Результат проверки:</strong><br>
+                        <span id="verify-output-text"></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 9. OpenSSL команды -->
+        <section id="commands" class="content-section bg-light">
+            <div class="container">
+                <h2>Справочник OpenSSL команд</h2>
+                <div class="command-list">
+                    <!-- Cards will be populated here by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 10. Результаты работы программы -->
+        <section id="results" class="content-section">
+            <div class="container">
+                <h2>Результаты работы программы</h2>
+                <div class="stats-panel">
+                    <div class="stat-box">Успешных операций: <span id="stat-success">0</span></div>
+                    <div class="stat-box error-box">Ошибок: <span id="stat-error">0</span></div>
+                    <button id="btn-clear-log" class="btn btn-outline" style="margin-left: auto;">Очистить результаты</button>
+                </div>
+                <div class="log-container" id="operations-log">
+                    <!-- Logs appear here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 11. Инструкция -->
+        <section id="instruction" class="content-section bg-light">
+            <div class="container">
+                <h2>Инструкция пользователя</h2>
+                <ol class="instruction-list">
+                    <li>Откройте веб-приложение.</li>
+                    <li>Перейдите в раздел "Генерация ключа".</li>
+                    <li>Выберите алгоритм RSA или EC.</li>
+                    <li>Сформируйте команду генерации ключа.</li>
+                    <li>Перейдите в раздел "Создание CSR".</li>
+                    <li>Заполните поля CN, O, C и Email.</li>
+                    <li>Сформируйте команду создания CSR.</li>
+                    <li>Перейдите в раздел "Выпуск сертификата".</li>
+                    <li>Выберите самоподписанный сертификат или сертификат через CA.</li>
+                    <li>Сформируйте команду выпуска сертификата.</li>
+                    <li>Перейдите в раздел "Проверка сертификата".</li>
+                    <li>Проверьте структуру сертификата, срок действия и fingerprint.</li>
+                    <li>Сохраните результаты для отчёта.</li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- Анализ, Практическая значимость, Об авторе -->
+        <section id="about" class="content-section">
+            <div class="container">
+                <div class="grid-2col">
+                    <div class="card">
+                        <h2>Анализ используемых программных средств</h2>
+                        <ul class="task-list">
+                            <li><strong>HTML5</strong> — структура веб-приложения;</li>
+                            <li><strong>CSS3</strong> — оформление интерфейса;</li>
+                            <li><strong>JavaScript</strong> — логика генератора команд и симуляции;</li>
+                            <li><strong>OpenSSL</strong> — инструмент для создания ключей, CSR и сертификатов;</li>
+                            <li><strong>GitHub</strong> — хранение исходного кода;</li>
+                            <li><strong>Vercel</strong> — размещение веб-приложения.</li>
+                        </ul>
+                        <p style="margin-top: 15px;">Реализация в виде веб-приложения обеспечивает кроссплатформенность, так как программа запускается в браузере и не требует установки дополнительного программного обеспечения.</p>
+                    </div>
+                    <div class="card">
+                        <h2>Практическая значимость</h2>
+                        <p>Разработанное веб-приложение позволяет наглядно изучить процесс создания цифровых сертификатов с помощью OpenSSL. Пользователь может сформировать команды генерации ключей, создания CSR-запроса, выпуска сертификата и проверки его параметров. Программа может использоваться как учебный инструмент при изучении PKI, TLS/SSL и криптографических средств защиты информации.</p>
+                        <p style="margin-top: 15px;"><strong>Проект разработан студентом Мадрахимовым Сарваром.</strong></p>
+                    </div>
+                </div>
+                <div class="card about-card" style="margin-top: 30px; text-align: center;">
+                    <h2>Об авторе</h2>
+                    <p>Мадрахимов Сарвар — автор веб-приложения OpenSSL Certificate Builder, разработанного в рамках индивидуального проекта по информационной безопасности.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container text-center">
+            <p style="padding: 20px 0; color: var(--text-muted); font-size: 0.9rem;">
+                OpenSSL Certificate Builder | Автор: Мадрахимов Сарвар
+            </p>
+        </div>
+    </footer>
+
+    <!-- Toast container -->
+    <div id="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
